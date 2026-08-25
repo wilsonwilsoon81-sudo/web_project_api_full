@@ -94,6 +94,27 @@ const getUserById = (req, res) => {
     });
 };
 
+const getCurrentUser = (req, res) => {
+  User.findById(req.user._id)
+    .orFail(() => {
+      const err = new Error('Usuario no encontrado');
+      err.statusCode = 404;
+      throw err;
+    })
+    .then((user) => {
+      res.status(200).send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'ID de usuario inválido' });
+      }
+      if (err.statusCode === 404) {
+        return res.status(404).send({ message: err.message });
+      }
+      return res.status(500).send({ message: 'Ha ocurrido un error en el servidor' });
+    });
+};
+
 const updateUserProfile = (req, res) => {
   const { name, about } = req.body;
 
@@ -147,6 +168,7 @@ const updateUserAvatar = (req, res) => {
 module.exports = {
   getUsers,
   getUserById,
+  getCurrentUser,
   createUser,
   updateUserProfile,
   updateUserAvatar,
