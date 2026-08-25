@@ -4,7 +4,7 @@ module.exports = (req, res, next) => {
   const { authorization = '' } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res.status(401).send({ message: 'No autorizado' });
+    return res.status(403).send({ message: 'Acceso denegado: no se proporcionó un token' });
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -13,7 +13,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, process.env.JWT_SECRET || 'super-secret-key-practicum');
   } catch (err) {
-    return res.status(401).send({ message: 'No autorizado' });
+    return res.status(403).send({ message: 'Acceso denegado: token inválido o expirado' });
   }
 
   req.user = payload;
