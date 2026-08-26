@@ -25,14 +25,20 @@ const createCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  Card.findByIdAndDelete(req.params.cardId)
+  Card.findById(req.params.cardId)
     .orFail(() => {
       const err = new Error('Tarjeta no encontrada');
       err.statusCode = 404;
       throw err;
     })
     .then((card) => {
-      res.status(200).send({ message: 'Tarjeta eliminada', card });
+      if (card.owner.toString() !== req.user._id) {
+        return res.status(403).send({ message: 'No tienes permiso para eliminar esta tarjeta' });
+      }
+      return Card.findByIdAndDelete(req.params.cardId);
+    })
+    .then((deletedCard) => {
+      res.status(200).send({ message: 'Tarjeta eliminada', card: deletedCard });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -48,7 +54,7 @@ const deleteCard = (req, res) => {
 const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.user._id } }, // Agrega solo si no existe
+    { $addToSet: { likes: req.user._id } },
     { new: true },
   )
     .orFail(() => {
@@ -71,7 +77,7 @@ const likeCard = (req, res) => {
 const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.user._id } }, // Elimina el ID del array
+    { $pull: { likes: req.user._id } },
     { new: true },
   )
     .orFail(() => {
