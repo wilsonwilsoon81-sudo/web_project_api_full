@@ -4,6 +4,7 @@ const { createUser, login } = require('./controllers/users');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/error-handler');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -57,6 +58,12 @@ app.use('/cards', cardsRouter);
 app.use((req, res) => {
   res.status(404).send({ message: 'Recurso solicitado no encontrado' });
 });
+
+app.use((req, res) => {
+  res.status(400).send({ message: 'Solicitud incorrecta' });
+});
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);

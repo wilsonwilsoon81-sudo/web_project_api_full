@@ -1,20 +1,16 @@
-// bcryptjs is required at runtime for password hashing and comparison.
-// eslint-disable-next-line import/no-extraneous-dependencies
 const bcrypt = require('bcryptjs');
-// jsonwebtoken is required at runtime for signing authentication tokens.
-// eslint-disable-next-line import/no-extraneous-dependencies
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const createUser = (req, res) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
+const createUser = (req, res, next) => {
+  const { name, about, avatar, email, password } = req.body;
 
   User.findOne({ email })
     .then((user) => {
       if (user) {
-        return res.status(409).send({ message: 'Este email ya está registrado' });
+        const err = new Error('Este email ya está registrado');
+        err.statusCode = 409;
+        throw err;
       }
       return bcrypt.hash(password, 10).then((hash) => User.create({
         name,
@@ -35,47 +31,52 @@ const createUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Datos inválidos' });
+        err.statusCode = 400;
       }
-      if (err.code === 11000) {
-        return res.status(409).send({ message: 'Este email ya está registrado' });
-      }
-      return res.status(500).send({ message: 'Error interno del servidor' });
+      next(err);
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return res.status(401).send({ message: 'Credenciales incorrectas' });
+        const err = new Error('Credenciales incorrectas');
+        err.statusCode = 401;
+        throw err;
       }
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
-          return res.status(401).send({ message: 'Credenciales incorrectas' });
+          const err = new Error('Credenciales incorrectas');
+          err.statusCode = 401;
+          throw err;
         }
         const token = jwt.sign(
           { _id: user._id },
           process.env.JWT_SECRET || 'super-secret-key-practicum',
           { expiresIn: '7d' },
         );
-        return res.send({ token });
+        res.send({ token });
       });
     })
-    .catch(() => {
-      res.status(500).send({ message: 'Error interno del servidor' });
+    .catch((err) => {
+      if (err.statusCode === 401) {
+        next(err);
+      } else {
+        next(err);
+      }
     });
 };
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send(users))
-    .catch(() => res.status(500).send({ message: 'Error interno del servidor' }));
+    .catch(next);
 };
 
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(() => {
       const err = new Error('Usuario no encontrado');
@@ -85,37 +86,29 @@ const getUserById = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'ID de usuario inválido' });
+        err.statusCode = 400;
       }
-      if (err.statusCode === 404) {
-        return res.status(404).send({ message: err.message });
-      }
-      return res.status(500).send({ message: 'Error interno del servidor' });
+      next(err);
     });
 };
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(() => {
       const err = new Error('Usuario no encontrado');
       err.statusCode = 404;
       throw err;
     })
-    .then((user) => {
-      res.status(200).send(user);
-    })
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'ID de usuario inválido' });
+        err.statusCode = 400;
       }
-      if (err.statusCode === 404) {
-        return res.status(404).send({ message: err.message });
-      }
-      return res.status(500).send({ message: 'Ha ocurrido un error en el servidor' });
+      next(err);
     });
 };
 
-const updateUserProfile = (req, res) => {
+const updateUserProfile = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
@@ -131,16 +124,13 @@ const updateUserProfile = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Datos inválidos' });
+        err.statusCode = 400;
       }
-      if (err.statusCode === 404) {
-        return res.status(404).send({ message: err.message });
-      }
-      return res.status(500).send({ message: 'Error interno del servidor' });
+      next(err);
     });
 };
 
-const updateUserAvatar = (req, res) => {
+const updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -156,12 +146,9 @@ const updateUserAvatar = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Datos inválidos' });
+        err.statusCode = 400;
       }
-      if (err.statusCode === 404) {
-        return res.status(404).send({ message: err.message });
-      }
-      return res.status(500).send({ message: 'Error interno del servidor' });
+      next(err);
     });
 };
 
