@@ -81,12 +81,17 @@ function App() {
           localStorage.setItem('jwt', data.token);
           api.setToken(data.token);
           
-          return api.getUserInfo().then((userData) => {
-            setCurrentUser(userData);
-            setIsLoggedIn(true);
-            navigate('/', { replace: true });
-          });
+          return Promise.all([
+            api.getUserInfo(),
+            api.getInitialCards()
+          ]);
         }
+      })
+      .then(([userData, cardsData]) => {
+        setCurrentUser(userData);
+        setCards(Array.isArray(cardsData) ? cardsData : []);
+        setIsLoggedIn(true);
+        navigate('/', { replace: true });
       })
       .catch(() => {
         setIsRegisterSuccess(false);
@@ -103,12 +108,14 @@ function App() {
     navigate('/signin', { replace: true });
   };
 
-  const handleCardLike = (card) => {
+    const handleCardLike = (card) => {
     const isLiked = card.likes.some(id => id === currentUser._id || id._id === currentUser._id);
     
     api.changeLikeCardStatus(card._id, !isLiked)
       .then((updatedCard) => {
-        setCards((prevCards) => prevCards.map((c) => (c._id === card._id ? updatedCard : c)));
+        setCards((prevCards) => 
+          prevCards.map((c) => (c._id === card._id ? updatedCard : c))
+        );
       })
       .catch((err) => console.error("Error al dar like:", err));
   };
