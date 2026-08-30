@@ -38,6 +38,12 @@ mongoose.connect('mongodb://localhost:27017/aroundb')
     console.log('❌ Error al conectar a MongoDB:', err);
   });
 
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Servidor en prueba de caída intencional');
+  }, 0);
+});
+
 app.post('/signup', validateSignUp, createUser);
 app.post('/signin', validateSignIn, login);
 
