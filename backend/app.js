@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const { createUser, login } = require('./controllers/users');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
@@ -16,32 +17,17 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(requestLogger);
 
-const allowedCors = [
-  'https://wilson-around.mooo.com',
-  'https://www.wilson-around.mooo.com',
-  'http://localhost:3000',
-  'http://localhost:3001',
-];
+const corsOptions = {
+  origin: [
+    'https://wilson-around.mooo.com',
+    'https://www.wilson-around.mooo.com',
+    'http://localhost:3000',
+    'http://localhost:3001',
+  ],
+  credentials: true,
+};
 
-app.use((req, res, next) => {
-  const { origin } = req.headers;
-  const { method } = req;
-  const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
-  const requestHeaders = req.headers['access-control-request-headers'];
-
-  if (allowedCors.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-    res.header('Access-Control-Allow-Credentials', true);
-  }
-
-  if (method === 'OPTIONS') {
-    res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
-    res.header('Access-Control-Allow-Headers', requestHeaders);
-    return res.end();
-  }
-
-  return next();
-});
+app.use(cors(corsOptions));
 
 mongoose.connect('mongodb://localhost:27017/aroundb')
   .then(() => {
