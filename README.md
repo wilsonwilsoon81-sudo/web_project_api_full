@@ -1,4 +1,4 @@
-# 🌍 Around - Proyecto Final Fullstack
+# 🌍 Around - Proyecto sprint 19 Fullstack
 
 ## 📝 Descripción del Proyecto
 Around es una aplicación web fullstack que permite a los usuarios registrarse, iniciar sesión, gestionar su perfil (nombre, descripción y avatar) y interactuar con un muro de tarjetas (crear, eliminar y dar "me gusta"). 
@@ -39,8 +39,8 @@ Este proyecto representa la culminación del desarrollo frontend y backend, impl
 - ✅ Tolerancia a fallos: reinicio automático del servidor con PM2.
 
 ## 📸 Capturas de Pantalla
-![Página de inicio]()
-![Perfil de usuario]()
+![Página de inicio](./screenshots/home.png)
+![Perfil de usuario](./screenshots/profile.png)
 
 ## 💻 Instrucciones para Ejecutar Localmente
 
