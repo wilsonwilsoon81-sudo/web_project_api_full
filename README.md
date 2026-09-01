@@ -71,4 +71,4 @@ npm run dev
 
 El frontend estará disponible en http://localhost:3001 (o el puerto que indique Vite)
 
-Desarrollado por Wilson Rolando Herrera Romero como proyecto sprint 19 del curso de Desarrollo Web Fullstack.
+### Desarrollado por Wilson Rolando Herrera Romero como proyecto sprint 19 del curso de Desarrollo Web Fullstack.

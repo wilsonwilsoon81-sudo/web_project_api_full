@@ -4,13 +4,11 @@ import CurrentUserContext from "../../../../contexts/CurrentUserContext.js";
 export default function Card({ card, onCardClick, onCardLike, onCardDelete }) {
   const currentUser = useContext(CurrentUserContext) || {};
 
-  // 1. Verificar si el usuario actual es el dueño de la tarjeta (para mostrar el botón de borrar)
   const isOwn = card.owner === currentUser._id || card.owner?._id === currentUser._id;
   const cardDeleteButtonClassName = `card__delete-button ${
     isOwn ? "card__delete-button_visible" : ""
   }`;
 
-  // 2. Verificar si el usuario actual ya dio like a la tarjeta
   const isLiked = card.likes.some(
     (id) => id === currentUser._id || id._id === currentUser._id
   );
@@ -27,7 +25,6 @@ export default function Card({ card, onCardClick, onCardLike, onCardDelete }) {
   }
 
   function handleImageClick() {
-    // ✅ Aquí avisamos a App.jsx que abra el popup con esta tarjeta
     onCardClick(card);
   }
 

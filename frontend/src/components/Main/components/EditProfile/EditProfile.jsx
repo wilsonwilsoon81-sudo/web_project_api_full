@@ -6,9 +6,26 @@ export default function EditProfile({ onUpdateUser, onClose }) {
   const [name, setName] = useState(currentUser?.name || "");
   const [description, setDescription] = useState(currentUser?.about || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [nameError, setNameError] = useState("");
+  const [descriptionError, setDescriptionError] = useState("");
+
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    setName(value);
+    setNameError(value.length < 2 ? "Debe tener al menos 2 caracteres" : "");
+  };
+
+  const handleDescriptionChange = (e) => {
+    const value = e.target.value;
+    setDescription(value);
+    setDescriptionError(value.length < 2 ? "Debe tener al menos 2 caracteres" : "");
+  };
 
   function handleSubmit(e) {
     e.preventDefault();
+    if (nameError || descriptionError || !name || !description) return; // Bloquear si hay error
+    
     setIsSubmitting(true);
     if (onUpdateUser) {
       onUpdateUser({ name, about: description })
@@ -29,8 +46,9 @@ export default function EditProfile({ onUpdateUser, onClose }) {
           minLength="2"
           maxLength="40"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={handleNameChange}
         />
+        <span className="popup__error">{nameError}</span>
       </label>
 
       <label className="popup__label">
@@ -42,14 +60,15 @@ export default function EditProfile({ onUpdateUser, onClose }) {
           minLength="2"
           maxLength="200"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={handleDescriptionChange}
         />
+        <span className="popup__error">{descriptionError}</span>
       </label>
 
       <button 
         type="submit" 
-        className={`button popup__button ${!name || !description ? 'popup__button_disabled' : ''}`}
-        disabled={isSubmitting || !name || !description}
+        className={`button popup__button ${!name || !description || nameError || descriptionError ? 'popup__button_disabled' : ''}`}
+        disabled={isSubmitting || !name || !description || nameError || descriptionError}
       >
         {isSubmitting ? "Guardando..." : "Guardar"}
       </button>

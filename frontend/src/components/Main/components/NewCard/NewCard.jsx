@@ -4,9 +4,19 @@ export default function NewCard({ onAddPlace, onClose }) {
   const [name, setName] = useState("");
   const [link, setLink] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [nameError, setNameError] = useState("");
+
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    setName(value);
+    setNameError(value.length < 2 ? "Debe tener al menos 2 caracteres" : "");
+  };
 
   function handleSubmit(e) {
     e.preventDefault();
+    if (nameError || !name || !link) return;
+    
     setIsSubmitting(true);
     if (onAddPlace) {
       onAddPlace({ name, link })
@@ -27,8 +37,9 @@ export default function NewCard({ onAddPlace, onClose }) {
           minLength="2"
           maxLength="30"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={handleNameChange}
         />
+        <span className="popup__error">{nameError}</span>
       </label>
 
       <label className="popup__label">
@@ -45,8 +56,8 @@ export default function NewCard({ onAddPlace, onClose }) {
 
       <button 
         type="submit" 
-        className={`button popup__button ${!name || !link ? 'popup__button_disabled' : ''}`}
-        disabled={isSubmitting || !name || !link}
+        className={`button popup__button ${!name || !link || nameError ? 'popup__button_disabled' : ''}`}
+        disabled={isSubmitting || !name || !link || nameError}
       >
         {isSubmitting ? "Creando..." : "Crear"}
       </button>
