@@ -108,10 +108,12 @@ function App() {
     navigate('/signin', { replace: true });
   };
 
-    const handleCardLike = (card) => {
-    const isLiked = card.likes.some(id => id === currentUser._id || id._id === currentUser._id);
+      const handleCardLike = (card) => {
+    const isLiked = card.likes.some(
+      (id) => id === currentUser._id || id._id === currentUser._id
+    );
     
-    api.changeLikeCardStatus(card._id, !isLiked)
+    api.changeLikeCardStatus(card._id, isLiked)
       .then((updatedCard) => {
         setCards((prevCards) => 
           prevCards.map((c) => (c._id === card._id ? updatedCard : c))

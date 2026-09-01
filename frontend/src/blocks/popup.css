@@ -240,6 +240,18 @@
   z-index: -1;
 }
 
+.popup__error {
+  color: #FF0000;
+  font-size: 12px;
+  line-height: 15px;
+  display: block;
+  min-height: 16px;
+  margin-top: -5px;
+  margin-bottom: 5px;
+  font-style: normal;
+  font-weight: 400;
+}
+
 @media screen and (max-width: 544px) {
   .popup {
     bottom: 112px;
