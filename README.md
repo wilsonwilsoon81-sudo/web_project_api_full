@@ -52,6 +52,7 @@ Este proyecto representa la culminación del desarrollo frontend y backend, impl
 ```bash
 git clone https://github.com/wilsonwilsoon81-sudo/web_project_api_full.git
 cd web_project_api_full
+```
 
 ### 2. Configurar el Backend
 ```bash
@@ -61,6 +62,7 @@ npm install
 npm run dev
 
 El backend estará disponible en http://localhost:3000
+```
 
 ### 3. Configurar el Frontend
 
@@ -70,5 +72,6 @@ npm install
 npm run dev
 
 El frontend estará disponible en http://localhost:3001 (o el puerto que indique Vite)
+```
 
 ### Desarrollado por Wilson Rolando Herrera Romero como proyecto sprint 19 del curso de Desarrollo Web Fullstack.
